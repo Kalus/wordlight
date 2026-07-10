@@ -1,0 +1,162 @@
+:root {
+  --wordlight-x: 50%;
+  --wordlight-y: 50%;
+}
+
+body.wordlight {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: radial-gradient(circle at var(--wordlight-x) var(--wordlight-y), #292927 0, #171716 20rem, #0b0b0a 48rem, #080808 100%);
+  color: #a8a8a4;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body.wordlight::before,
+body.wordlight::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.wordlight::before {
+  opacity: .28;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+body.wordlight::after {
+  background: radial-gradient(circle at var(--wordlight-x) var(--wordlight-y), rgba(255,252,224,.34) 0, rgba(224,221,198,.18) 20rem, rgba(190,188,172,.06) 34rem, transparent 48rem);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity .55s ease;
+}
+
+body.wordlight--focused::after { opacity: 1; }
+
+.wordlight__light {
+  position: fixed;
+  z-index: 4;
+  left: 0;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: #fff;
+  box-shadow: 0 0 10px 3px rgba(255,255,240,.9), 0 0 28px 12px rgba(255,250,220,.22), 0 0 68px 30px rgba(255,247,200,.08);
+  transform: translate3d(calc(var(--wordlight-pointer-x, 50vw) - 50%), calc(var(--wordlight-pointer-y, 50vh) - 50%), 0);
+}
+
+.wordlight__wall {
+  position: relative;
+  z-index: 2;
+  width: min(1120px, 100%);
+  margin: 0;
+  text-align: justify;
+  text-align-last: left;
+  font-size: clamp(25px, 3.25vw, 54px);
+  font-weight: 540;
+  line-height: 1.29;
+  letter-spacing: -.035em;
+  transform: rotateX(.35deg);
+}
+
+.wordlight__word {
+  display: inline-block;
+  position: relative;
+  color: #a8a8a4;
+  opacity: var(--wordlight-brightness, .7);
+  text-shadow: var(--wordlight-shadow, 10px 12px 7px rgba(0,0,0,.8));
+  transform: translateZ(var(--wordlight-depth, 0));
+  transition: opacity .7s cubic-bezier(.22,1,.36,1), color .35s ease, filter .7s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+  will-change: text-shadow, opacity;
+}
+
+.wordlight__noun {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #e63f38;
+  font: inherit;
+  font-weight: 820;
+  letter-spacing: inherit;
+}
+
+.wordlight__noun::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: .02em;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform .35s cubic-bezier(.22,1,.36,1);
+}
+
+.wordlight__noun:hover::after,
+.wordlight__noun:focus-visible::after { transform: scaleX(1); transform-origin: left; }
+.wordlight__noun:focus-visible { outline: 2px solid #fff; outline-offset: 5px; border-radius: 2px; }
+
+body.wordlight--focused .wordlight__word:not(.wordlight__selected) {
+  opacity: .025 !important;
+  filter: blur(2.5px);
+  transform: translateZ(-80px) scale(.985);
+  pointer-events: none;
+}
+
+body.wordlight--focused .wordlight__selected {
+  z-index: 3;
+  opacity: 1 !important;
+  color: #ff4c44;
+  filter: none;
+  text-shadow: none;
+  transform: translateZ(65px) scale(1.045);
+}
+
+.wordlight__projection {
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: min(980px, 86vw);
+  pointer-events: none;
+  color: rgba(0,0,0,.73);
+  font-size: clamp(30px, 5vw, 78px);
+  font-weight: 850;
+  line-height: .94;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+  text-align: center;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translate(calc(-50% + var(--wordlight-cast-x, 0px)), calc(-50% + var(--wordlight-cast-y, 0px))) scale(.82);
+  transition: opacity .6s ease, filter .85s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+}
+
+.wordlight__projection::before {
+  content: "Projected definition";
+  display: block;
+  margin-bottom: 17px;
+  color: rgba(255,255,255,.16);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+
+body.wordlight--focused .wordlight__projection {
+  opacity: 1;
+  filter: blur(.65px);
+  transform: translate(calc(-50% + var(--wordlight-cast-x, 0px)), calc(-50% + var(--wordlight-cast-y, 0px))) scale(1);
+}
+
+@media (pointer: fine) { body.wordlight, body.wordlight * { cursor: none !important; } }
+@media (pointer: coarse) { .wordlight__light { display: none; } }
+@media (max-width: 600px) { .wordlight__wall { text-align: left; font-size: clamp(24px, 7.2vw, 35px); } }
+@media (prefers-reduced-motion: reduce) { .wordlight__word { text-shadow: 9px 11px 6px rgba(0,0,0,.82) !important; } }

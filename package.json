@@ -1,0 +1,20 @@
+{
+  "name": "@kalus/wordlight",
+  "version": "0.1.0",
+  "description": "A dependency-free, pointer-lit text wall with definition projections.",
+  "type": "module",
+  "exports": {
+    ".": "./src/wordlight.js",
+    "./style.css": "./src/wordlight.css"
+  },
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "typography",
+    "interaction",
+    "text-effect",
+    "creative-coding"
+  ],
+  "license": "MIT"
+}
