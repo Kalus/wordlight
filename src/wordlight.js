@@ -47,6 +47,7 @@ export function createWordlight({ wall, projection, light, back, root = document
   let selected = null;
   let frame = 0;
   let pointer = { x: innerWidth / 2, y: innerHeight / 2 };
+  const coarsePointer = matchMedia('(pointer: coarse)');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function wrapTextNode(node) {
@@ -98,7 +99,9 @@ export function createWordlight({ wall, projection, light, back, root = document
   }
 
   function schedule(event) {
-    if (event) pointer = { x: event.clientX, y: event.clientY };
+    pointer = coarsePointer.matches
+      ? { x: innerWidth / 2, y: innerHeight / 2 }
+      : event ? { x: event.clientX, y: event.clientY } : pointer;
     if (!frame) frame = requestAnimationFrame(render);
   }
 
@@ -126,6 +129,10 @@ export function createWordlight({ wall, projection, light, back, root = document
 
   nouns.forEach(noun => noun.addEventListener('click', () => select(noun)));
   elements.back?.addEventListener('click', () => clear({ restoreFocus: true }));
+  document.addEventListener('click', event => {
+    if (!selected || selected.contains(event.target) || elements.back?.contains(event.target)) return;
+    clear();
+  });
   addEventListener('pointermove', schedule, { passive: true });
   addEventListener('resize', schedule, { passive: true });
   addEventListener('keydown', event => {

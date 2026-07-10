@@ -36,7 +36,8 @@ Pass an optional `back` selector or element to expose a control that restores th
 
 - No dependencies or build step.
 - Uses standard browser APIs and CSS custom properties.
-- On touch screens, the cursor light is hidden and definitions still work by tapping.
+- On touch screens, the light source stays at the viewport center and definitions work by tapping.
+- Click or tap outside a selected word to dismiss its definition.
 - Honors `prefers-reduced-motion`.
 
 ## License
