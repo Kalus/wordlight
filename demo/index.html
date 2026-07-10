@@ -5,34 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090909">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="../src/wordlight.css">
   <title>Wordlight — Demo</title>
   <style>
-    .demo-main { position: relative; z-index: 2; min-height: 100vh; display: grid; place-items: center; padding: clamp(90px,12vw,150px) clamp(24px,7vw,110px); perspective: 900px; }
-    .demo-topline { position: fixed; z-index: 5; top: 22px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: center; color: rgba(255,255,255,.44); font: 700 10px/1 Arial,sans-serif; letter-spacing: .18em; text-transform: uppercase; }
-    .demo-hint { transition: opacity .4s ease; }
-    .wordlight--focused .demo-hint { opacity: 0; }
-    .demo-back { position: absolute; top: -9px; right: 0; visibility: hidden; opacity: 0; transform: translateY(-5px); border: 1px solid rgba(255,255,255,.17); border-radius: 999px; padding: 9px 12px; background: rgba(0,0,0,.2); color: rgba(255,255,255,.72); font: inherit; letter-spacing: inherit; text-transform: inherit; transition: opacity .35s ease, transform .35s cubic-bezier(.22,1,.36,1); }
-    .wordlight--focused .demo-back { visibility: visible; opacity: 1; transform: none; }
-    @media (max-width: 600px) { .demo-main { padding-inline: 20px; } .demo-topline { top: 18px; left: 16px; right: 16px; justify-content: flex-end; } .demo-topline > span:first-child { display: none; } .demo-hint { font-size: 9px; } }
+    :root { --x: 50%; --y: 50%; }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; overflow-x: hidden; background: radial-gradient(circle at var(--x) var(--y),#292927 0,#171716 20rem,#0b0b0a 48rem,#080808 100%); color:#a8a8a4; font-family:Arial,Helvetica,sans-serif; }
+    body::before,body::after { content:""; position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::before { opacity:.28; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E"); mix-blend-mode:soft-light; }
+    body::after { background:radial-gradient(circle at var(--x) var(--y),rgba(255,252,224,.34) 0,rgba(224,221,198,.18) 20rem,rgba(190,188,172,.06) 34rem,transparent 48rem); mix-blend-mode:screen; opacity:0; transition:opacity .55s ease; }
+    body.focused::after { opacity:1; }
+    .light { position:fixed; z-index:4; left:0; top:0; width:9px; height:9px; border-radius:50%; pointer-events:none; background:#fff; box-shadow:0 0 10px 3px rgba(255,255,240,.9),0 0 28px 12px rgba(255,250,220,.22),0 0 68px 30px rgba(255,247,200,.08); transform:translate3d(calc(var(--pointer-x,50vw) - 50%),calc(var(--pointer-y,50vh) - 50%),0); }
+    .topline { position:fixed; z-index:5; top:22px; left:24px; right:24px; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,.44); font:700 10px/1 Arial,sans-serif; letter-spacing:.18em; text-transform:uppercase; }
+    .hint { transition:opacity .4s ease; } body.focused .hint { opacity:0; }
+    .back { position:absolute; top:-9px; right:0; visibility:hidden; opacity:0; transform:translateY(-5px); border:1px solid rgba(255,255,255,.17); border-radius:999px; padding:9px 12px; background:rgba(0,0,0,.2); color:rgba(255,255,255,.72); font:inherit; letter-spacing:inherit; text-transform:inherit; transition:opacity .35s ease,transform .35s cubic-bezier(.22,1,.36,1); }
+    body.focused .back { visibility:visible; opacity:1; transform:none; }
+    main { position:relative; z-index:2; min-height:100vh; display:grid; place-items:center; padding:clamp(90px,12vw,150px) clamp(24px,7vw,110px); perspective:900px; }
+    .wall { width:min(1120px,100%); margin:0; text-align:justify; text-align-last:left; font-size:clamp(25px,3.25vw,54px); font-weight:540; line-height:1.29; letter-spacing:-.035em; transform:rotateX(.35deg); }
+    .word { display:inline-block; position:relative; color:#a8a8a4; opacity:var(--brightness,.7); text-shadow:var(--shadow,10px 12px 7px rgba(0,0,0,.8)); transform:translateZ(var(--depth,0)); transition:opacity .7s cubic-bezier(.22,1,.36,1),color .35s ease,filter .7s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1); will-change:text-shadow,opacity; }
+    .noun { appearance:none; border:0; padding:0; background:none; color:#e63f38; font:inherit; font-weight:820; letter-spacing:inherit; }
+    .noun::after { content:""; position:absolute; left:0; right:0; bottom:.02em; height:2px; background:currentColor; transform:scaleX(0); transform-origin:right; transition:transform .35s cubic-bezier(.22,1,.36,1); }
+    .noun:hover::after,.noun:focus-visible::after { transform:scaleX(1); transform-origin:left; }
+    .noun:focus-visible { outline:2px solid #fff; outline-offset:5px; border-radius:2px; }
+    body.focused .word:not(.selected) { opacity:.025!important; filter:blur(2.5px); transform:translateZ(-80px) scale(.985); pointer-events:none; }
+    body.focused .selected { z-index:3; opacity:1!important; color:#ff4c44; filter:none; text-shadow:none; transform:translateZ(65px) scale(1.045); }
+    .projection { position:fixed; z-index:1; left:50%; top:50%; width:min(980px,86vw); pointer-events:none; color:rgba(0,0,0,.73); font-size:clamp(30px,5vw,78px); font-weight:850; line-height:.94; letter-spacing:-.055em; text-wrap:balance; text-align:center; opacity:0; filter:blur(8px); transform:translate(calc(-50% + var(--cast-x,0px)),calc(-50% + var(--cast-y,0px))) scale(.82); transition:opacity .6s ease,filter .85s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1); }
+    .projection::before { content:"Projected definition"; display:block; margin-bottom:17px; color:rgba(255,255,255,.16); font-size:10px; font-weight:800; letter-spacing:.24em; text-transform:uppercase; }
+    body.focused .projection { opacity:1; filter:blur(.65px); transform:translate(calc(-50% + var(--cast-x,0px)),calc(-50% + var(--cast-y,0px))) scale(1); }
+    @media (pointer:fine) { body,body * { cursor:none!important; } }
+    @media (pointer:coarse) { .light { display:none; } }
+    @media (max-width:600px) { main { padding-inline:20px; } .wall { text-align:left; font-size:clamp(24px,7.2vw,35px); } .topline { top:18px; left:16px; right:16px; justify-content:flex-end; } .topline > span:first-child { display:none; } .hint { font-size:9px; } }
+    @media (prefers-reduced-motion:reduce) { .word { text-shadow:9px 11px 6px rgba(0,0,0,.82)!important; } }
   </style>
 </head>
 <body>
-  <div class="wordlight__light" aria-hidden="true"></div>
-  <header class="demo-topline">
-    <span>Wordlight — 01</span>
-    <span class="demo-hint">Move the light · choose a red word</span>
-    <button class="demo-back" type="button" aria-label="Return to all words">← Back</button>
-  </header>
-  <main class="demo-main">
-    <p class="wordlight__wall">
-      At first there was only the room, then a faint <button data-definition="Light is the visible energy that makes the world legible—and gives every object a shadow." type="button">light</button> arrived and gave every sentence a place to stand. The words hovered just above the surface, close enough to read but far enough to leave evidence behind. A <button data-definition="A shadow is a dark record of something interrupting the path between a source and a surface." type="button">shadow</button> is not an object. It is the record of an interruption, a quiet proof that something stood between here and there. Move slowly and the whole <button data-definition="A wall is both boundary and canvas: the distant plane on which light turns depth into an image." type="button">wall</button> changes its mind. Some phrases step forward. Others retreat into the dark. Meaning behaves like <button data-definition="Gravity is the invisible attraction that gives weight, direction, and consequence to everything with mass." type="button">gravity</button>: invisible, directional, impossible to ignore. Choose a red <button data-definition="A word is a small vessel for a shared idea; selected carefully, it can illuminate much more than itself." type="button">word</button> and everything unnecessary will fall away. What remains is not the thing itself, but its <button data-definition="A definition draws a temporary boundary around an idea so that two minds can meet inside it." type="button">definition</button>—an idea enlarged by distance, cast onto the background like a thought too large to hold in the hand.
-    </p>
-  </main>
-  <div class="wordlight__projection"></div>
-  <script type="module">
-    import { createWordlight } from '../src/wordlight.js';
-    createWordlight({ wall: '.wordlight__wall', projection: '.wordlight__projection', light: '.wordlight__light', back: '.demo-back' });
+  <div class="light" aria-hidden="true"></div>
+  <header class="topline"><span>Wordlight — 01</span><span class="hint">Move the light · choose a red word</span><button class="back" type="button" aria-label="Return to all words">← Back</button></header>
+  <main><p class="wall">At first there was only the room, then a faint <button class="word noun" data-definition="Light is the visible energy that makes the world legible—and gives every object a shadow." type="button">light</button> arrived and gave every sentence a place to stand. The words hovered just above the surface, close enough to read but far enough to leave evidence behind. A <button class="word noun" data-definition="A shadow is a dark record of something interrupting the path between a source and a surface." type="button">shadow</button> is not an object. It is the record of an interruption, a quiet proof that something stood between here and there. Move slowly and the whole <button class="word noun" data-definition="A wall is both boundary and canvas: the distant plane on which light turns depth into an image." type="button">wall</button> changes its mind. Some phrases step forward. Others retreat into the dark. Meaning behaves like <button class="word noun" data-definition="Gravity is the invisible attraction that gives weight, direction, and consequence to everything with mass." type="button">gravity</button>: invisible, directional, impossible to ignore. Choose a red <button class="word noun" data-definition="A word is a small vessel for a shared idea; selected carefully, it can illuminate much more than itself." type="button">word</button> and everything unnecessary will fall away. What remains is not the thing itself, but its <button class="word noun" data-definition="A definition draws a temporary boundary around an idea so that two minds can meet inside it." type="button">definition</button>—an idea enlarged by distance, cast onto the background like a thought too large to hold in the hand.</p></main>
+  <div class="projection" aria-live="polite" aria-atomic="true"></div>
+  <script>
+    (() => {
+      const root = document.documentElement, body = document.body, wall = document.querySelector('.wall'), projection = document.querySelector('.projection'), back = document.querySelector('.back'), nouns = [...document.querySelectorAll('.noun')];
+      [...wall.childNodes].forEach(node => { if (node.nodeType !== Node.TEXT_NODE) return; const fragment = document.createDocumentFragment(); node.textContent.split(/(\s+)/).forEach(part => { if (!part) return; if (/^\s+$/.test(part)) return fragment.append(part); const span = document.createElement('span'); span.className = 'word'; span.textContent = part; fragment.append(span); }); node.replaceWith(fragment); });
+      const words = [...document.querySelectorAll('.word')]; words.forEach((word,index) => { const depth = 6 + ((index * 17) % 19); word.dataset.depth = depth; word.style.setProperty('--depth', `${depth * .35}px`); });
+      let pointer = { x: innerWidth / 2, y: innerHeight / 2 }, frame = 0, selected = null; const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function render() { frame = 0; const { x, y } = pointer; root.style.setProperty('--x', `${x / innerWidth * 100}%`); root.style.setProperty('--y', `${y / innerHeight * 100}%`); root.style.setProperty('--pointer-x', `${x}px`); root.style.setProperty('--pointer-y', `${y}px`); if (!reduceMotion) words.forEach(word => { const r = word.getBoundingClientRect(), dx = r.left + r.width / 2 - x, dy = r.top + r.height / 2 - y, distance = Math.max(70,Math.hypot(dx,dy)), depth = Number(word.dataset.depth), cast = depth * 1.15, proximity = Math.max(0,1 - distance / 620); word.style.setProperty('--brightness', (.44 + proximity * .56).toFixed(3)); word.style.setProperty('--shadow', `${(dx / distance * cast).toFixed(1)}px ${(dy / distance * cast).toFixed(1)}px ${(2.5 + depth * .24).toFixed(1)}px rgba(0,0,0,.9)`); }); if (selected) { const r = selected.getBoundingClientRect(), dx = r.left + r.width / 2 - x, dy = r.top + r.height / 2 - y, distance = Math.max(100,Math.hypot(dx,dy)); root.style.setProperty('--cast-x', `${dx / distance * 42}px`); root.style.setProperty('--cast-y', `${dy / distance * 30}px`); } }
+      function schedule(event) { if (event) pointer = { x:event.clientX, y:event.clientY }; if (!frame) frame = requestAnimationFrame(render); }
+      function clear() { selected?.classList.remove('selected'); selected = null; projection.textContent = ''; body.classList.remove('focused'); back.tabIndex = -1; schedule(); }
+      nouns.forEach(noun => noun.addEventListener('click', () => { if (selected === noun) return clear(); selected?.classList.remove('selected'); selected = noun; noun.classList.add('selected'); projection.textContent = noun.dataset.definition; body.classList.add('focused'); back.removeAttribute('tabindex'); schedule(); }));
+      back.addEventListener('click', clear); back.tabIndex = -1; addEventListener('pointermove', schedule, { passive:true }); addEventListener('resize', schedule, { passive:true }); addEventListener('keydown', event => { if (event.key === 'Escape' && selected) clear(); }); schedule();
+    })();
   </script>
 </body>
 </html>

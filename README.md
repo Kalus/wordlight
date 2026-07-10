@@ -4,13 +4,7 @@ A dependency-free browser effect that turns a wall of text into a pointer-lit fi
 
 ## Try it
 
-Open `demo/index.html` in a modern browser, or serve the project locally:
-
-```sh
-python3 -m http.server 4173
-```
-
-Then visit `http://localhost:4173/demo/`.
+Open `demo/index.html` directly in any modern browser. It is fully self-contained—no server, dependencies, or build step required.
 
 ## Use it
 
