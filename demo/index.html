@@ -26,14 +26,14 @@
     body.focused .back { visibility:visible; opacity:1; transform:none; }
     main { position:relative; z-index:2; min-height:100vh; display:grid; place-items:center; padding:clamp(90px,12vw,150px) clamp(24px,7vw,110px); perspective:900px; }
     .wall { width:min(1120px,100%); margin:0; text-align:justify; text-align-last:left; font-size:clamp(25px,3.25vw,54px); font-weight:540; line-height:1.29; letter-spacing:-.035em; transform:rotateX(.35deg); }
-    .word { display:inline-block; position:relative; color:#a8a8a4; opacity:var(--brightness,.7); text-shadow:var(--shadow,10px 12px 7px rgba(0,0,0,.8)); transform:translateZ(var(--depth,0)); transition:opacity .7s cubic-bezier(.22,1,.36,1),color .35s ease,filter .7s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1); will-change:text-shadow,opacity; }
+    .word { display:inline-block; position:relative; color:#a8a8a4; opacity:var(--brightness,.7); text-shadow:var(--shadow,10px 12px 7px rgba(0,0,0,.8)); transform:translateZ(var(--depth,0)); transition:opacity .7s cubic-bezier(.22,1,.36,1),color .35s ease,transform .8s cubic-bezier(.22,1,.36,1); will-change:text-shadow,opacity; }
     .noun { appearance:none; border:0; padding:0; background:none; color:#e63f38; font:inherit; font-weight:820; letter-spacing:inherit; }
     .noun::after { content:""; position:absolute; left:0; right:0; bottom:.02em; height:2px; background:currentColor; transform:scaleX(0); transform-origin:right; transition:transform .35s cubic-bezier(.22,1,.36,1); }
     .noun:hover::after,.noun:focus-visible::after { transform:scaleX(1); transform-origin:left; }
     .noun:focus-visible { outline:2px solid #fff; outline-offset:5px; border-radius:2px; }
     body.focused .word:not(.selected) { opacity:.025!important; filter:blur(2.5px); transform:translateZ(-80px) scale(.985); pointer-events:none; }
     body.focused .selected { z-index:3; opacity:1!important; color:#ff4c44; filter:none; text-shadow:none; transform:translateZ(65px) scale(1.045); }
-    .projection { position:fixed; z-index:1; left:50%; top:50%; width:min(980px,86vw); pointer-events:none; color:rgba(0,0,0,.73); font-size:clamp(30px,5vw,78px); font-weight:850; line-height:.94; letter-spacing:-.055em; text-wrap:balance; text-align:center; opacity:0; filter:blur(8px); transform:translate(calc(-50% + var(--cast-x,0px)),calc(-50% + var(--cast-y,0px))) scale(.82); transition:opacity .6s ease,filter .85s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1); }
+    .projection { position:fixed; z-index:1; left:50%; top:50%; width:min(980px,86vw); pointer-events:none; color:rgba(0,0,0,.73); font-size:clamp(30px,5vw,78px); font-weight:850; line-height:.94; letter-spacing:-.055em; text-wrap:balance; text-align:center; opacity:0; filter:blur(8px); transform:translate(calc(-50% + var(--cast-x,0px)),calc(-50% + var(--cast-y,0px))) scale(.82); transition:opacity .6s ease,transform .9s cubic-bezier(.22,1,.36,1); }
     body.focused .projection { opacity:1; filter:blur(.65px); transform:translate(calc(-50% + var(--cast-x,0px)),calc(-50% + var(--cast-y,0px))) scale(1); }
     @media (pointer:fine) { body,body * { cursor:none!important; } }
     @media (pointer:coarse) { .light { display:none; } }
